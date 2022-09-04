@@ -74,7 +74,11 @@ public class CommandListener extends ListenerAdapter {
 
             case "verifyme":
                 Integer numEtudiant = event.getOption("numetudiant").getAsInt();
-                event.reply("Demande envoyé à l'équipe d'administration.\nUne réponse vous sera donné sous 48h maximum.").setEphemeral(true).queue();
+                event.deferReply().setEphemeral(true).queue();
+                event.getHook().sendMessage("Demande envoyé à l'équipe d'administration.\nUne réponse vous sera donné dans les plus brefs délais.").setEphemeral(true).queue();
+                event.getUser().openPrivateChannel().queue((chan) -> {
+                    chan.sendMessage("Demande envoyé à l'équipe d'administration.\nUne réponse vous sera donné dans les plus brefs délais.").queue();
+                });
                 event.getGuild().getTextChannelById(1003729944951664782L).sendMessage("✉ `[" + getDate() + "]` L'utilisateur " +
                         event.getUser().getAsMention() + " a demandé à être vérifié avec le numéro d'étudiant suivant : **" + numEtudiant + "**.")
                         .setActionRow(Button.success("okStudent", "Accepter"), Button.danger("notOkStudent", "Refuser"),
@@ -107,6 +111,18 @@ public class CommandListener extends ListenerAdapter {
                     }
                     event.getHook().editOriginal("Réactions ajoutés au message !").queue();
                 });
+                break;
+
+            case "students":
+                event.deferReply().setEphemeral(true).queue();
+                for (Member student : event.getGuild().getMembers()){
+                    if (student.getRoles().get(0) != event.getGuild().getRoleById(1003689153877246022L)){
+                        try{
+                            event.getGuild().addRoleToMember(student, event.getGuild().getRoleById(1003689153877246022L)).queue();
+                        } catch (Exception exception){}
+                    }
+
+                }
                 break;
 
         }

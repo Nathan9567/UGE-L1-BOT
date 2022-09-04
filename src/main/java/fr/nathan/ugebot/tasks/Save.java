@@ -9,6 +9,7 @@ public class Save extends TimerTask {
     @Override
     public void run() {
         try {
+            PreRentree.getReactionFile();
             PreRentree.setReactionFile();
         } catch (IOException e) {
             throw new RuntimeException(e);

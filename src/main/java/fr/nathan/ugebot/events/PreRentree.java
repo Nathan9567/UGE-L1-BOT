@@ -35,6 +35,11 @@ public class PreRentree implements EventListener {
 //            List<String> Grp2 = Arrays.asList("6⃣", "7⃣", "8⃣", "9⃣", "\uD83D\uDD1F");
 //            List<String> Grp3 = Arrays.asList("<:11:1005119634191683694>", "<:12:1005119635605164124>", "<:13:1005119636687294574>", "<:14:1005119637782007899>", "<:15:1005119639094825082>");
 //            List<String> Grp4 = Arrays.asList("<:16:1005119639975641119>", "<:17:1010198262315229194>", "<:18:1010198263170879609>", "<:19:1010198264932483132>", "<:20:1010198266408878110>");
+            try {
+                getReactionFile();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             if (e.getMessageIdLong() == messageIdS1){
                 sessionReacAdd(e, reactionsMapS1, chanId, messageIdS1);
             } else if (e.getMessageIdLong() == messageIdS2) {
@@ -63,28 +68,24 @@ public class PreRentree implements EventListener {
 
         String line;
         int cmpt = 1;
-        try {
-            while ((line = br.readLine()) != null) {
-                line = line.replace("{", "").replace("}", "");
-                String parts[] = line.split(",");
-                for (String part : parts) {
-                    //split the reactions data by : to get id and number of reactions
-                    String empdata[] = part.split("=");
+        while ((line = br.readLine()) != null) {
+            line = line.replace("{", "").replace("}", "");
+            String parts[] = line.split(",");
+            for (String part : parts) {
+                //split the reactions data by : to get id and number of reactions
+                String empdata[] = part.split("=");
 
-                    String strId = empdata[0].trim();
-                    String strName = empdata[1].trim();
+                String strId = empdata[0].trim();
+                String strName = empdata[1].trim();
 
-                    //set map
-                    if (cmpt == 1) {
-                        reactionsMapS1.put(strId, Integer.valueOf(strName));
-                    } else if (cmpt == 2) {
-                        reactionsMapS2.put(strId, Integer.valueOf(strName));
-                    }
+                //set map
+                if (cmpt == 1) {
+                    reactionsMapS1.put(strId, Integer.valueOf(strName));
+                } else if (cmpt == 2) {
+                    reactionsMapS2.put(strId, Integer.valueOf(strName));
                 }
-                cmpt++;
             }
-        } catch (ArrayIndexOutOfBoundsException exception){
-            System.out.println("Liste de sessions vide");
+            cmpt++;
         }
         br.close();
     }

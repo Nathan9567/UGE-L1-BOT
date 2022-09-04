@@ -18,6 +18,7 @@ public class UGEBot {
 
 
     public static void main(String[] args) throws Exception {
+        // UGE BOT
         JDA api = JDABuilder.createDefault("ODgzMzgwNTI3NDE0MDE4MDc4.GWBo-b.2kkmxnTZetoWmlJDtf9Bams-9AJSthvDcG12jE").build();
 
         PermissionError permError = new PermissionError();
@@ -37,11 +38,12 @@ public class UGEBot {
                 .addOption(OptionType.INTEGER, "numero", "Numéro de session", true)
                 .addOption(OptionType.STRING, "messageid", "Identifiant du message", true)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
+        api.upsertCommand("students", "Met le rôle étudiant à tout le discord !")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
 
         api.awaitReady();
 
-        Timer task = new Timer();
-        task.schedule(new Save(), 0, 300000);
-        PreRentree.getReactionFile();
+//        Timer task = new Timer();
+//        task.schedule(new Save(), 0, 300000);
     }
 }
