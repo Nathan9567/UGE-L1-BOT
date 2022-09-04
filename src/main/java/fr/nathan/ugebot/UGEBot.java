@@ -2,6 +2,7 @@ package fr.nathan.ugebot;
 
 import fr.nathan.ugebot.events.ButtonListener;
 import fr.nathan.ugebot.events.CommandListener;
+import fr.nathan.ugebot.events.JoinListener;
 import fr.nathan.ugebot.events.PreRentree;
 import fr.nathan.ugebot.fonction.PermissionError;
 import fr.nathan.ugebot.tasks.Save;
@@ -23,12 +24,14 @@ public class UGEBot {
         api.addEventListener(new CommandListener(permError));
         api.addEventListener(new PreRentree());
         api.addEventListener(new ButtonListener());
+        api.addEventListener(new JoinListener());
 
         api.upsertCommand("ping", "Calcul ta latence avec le robot").queue();
         api.upsertCommand("verifyme", "Demande a un admin de te vérifier")
                 .addOption(OptionType.INTEGER, "numetudiant", "Numéro se trouvant sur ta carte étudiante.", true).queue();
         api.upsertCommand("verify", "Verifier un utilisateur manuellement")
                 .addOption(OptionType.USER, "utilisateur", "@personne a valider", true)
+                .addOption(OptionType.INTEGER, "numetudiant", "Numéro de l'étudiant a valider.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MENTION_EVERYONE)).queue();
         api.upsertCommand("session", "Initialise la session de votre choix")
                 .addOption(OptionType.INTEGER, "numero", "Numéro de session", true)

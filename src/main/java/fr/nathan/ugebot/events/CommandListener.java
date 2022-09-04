@@ -1,11 +1,13 @@
 package fr.nathan.ugebot.events;
 
 import fr.nathan.ugebot.fonction.PermissionError;
+import fr.nathan.ugebot.fonction.Verification;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +28,7 @@ public class CommandListener extends ListenerAdapter {
 
             case "ping":
                 long time = System.currentTimeMillis();
-                event.reply("Pong ! ").setEphemeral(true)
+                event.reply("Pong !").setEphemeral(true)
                         .flatMap(v ->
                                 event.getHook().editOriginalFormat("Pong : %d ms", System.currentTimeMillis() - time))
                         .queue();
@@ -34,23 +36,31 @@ public class CommandListener extends ListenerAdapter {
 
             case "verify":
                 Member mbr = event.getOption("utilisateur").getAsMember();
+                OptionMapping numEtuOption = event.getOption("numetudiant");
+
+                int numetu = 0;
+                if (numEtuOption != null){
+                    numetu = numEtuOption.getAsInt();
+                }
+
                 if (mbr != event.getMember()) {
                     boolean hasStudentRole = false;
                     for (Role role : mbr.getRoles()) {
-                        if (role.equals(event.getGuild().getRoleById(1003689153877246022L))) {
+                        if (role.equals(event.getGuild().getRoleById(1012973566104453170L))) {
                             hasStudentRole = true;
                         }
                     }
 
                     if (!hasStudentRole) {
                         try {
-                            event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1003689153877246022L)).queue();
+                            event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1012973566104453170L)).queue();
                             event.reply("L'utilisateur " + mbr.getAsMention() + " est désormais vérifié.").setEphemeral(true).queue();
                             event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
-                                    + mbr.getAsMention() + " a été vérifié par **" + event.getUser().getAsTag() + "** sans demande.").queue();
+                                    + mbr.getAsMention() + " a été vérifié **manuellement** par **" + event.getUser().getAsTag() + "**.").queue();
                             mbr.getUser().openPrivateChannel().queue((chan) -> {
-                                chan.sendMessage("Vous venez d'être vérifié par " + event.getUser().getAsTag() + "").queue();
+                                chan.sendMessage("Vous venez d'être vérifié par " + event.getUser().getAsTag() + ".").queue();
                             });
+                            Verification.addToFile(mbr.getId() + ";" + numetu);
                         } catch (Exception ex) {
                             event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                         }

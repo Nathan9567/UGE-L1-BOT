@@ -1,12 +1,17 @@
 package fr.nathan.ugebot.events;
 
+import fr.nathan.ugebot.fonction.Verification;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -15,10 +20,26 @@ public class ButtonListener extends ListenerAdapter {
         User user = event.getMessage().getMentions().getUsers().get(0);
         switch (event.getComponentId()) {
             case "okStudent":
-                event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1003689153877246022L)).queue();
-                user.openPrivateChannel().queue((chan -> {
-                    chan.sendMessage("Votre demande a été **accepté**. Vous avez désormais accès a l'ensemble des salons utiles a votre année.").queue();
-                }));
+                event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue();
+                String res = null;
+                String msg = event.getMessage().getContentRaw();
+                Matcher m = Pattern.compile("\\**(.*?)\\**").matcher(msg);
+                while (m.find()){
+                    res = m.group(1);
+                }
+//                String res = msg.substring(msg.indexOf("*")+2, msg.indexOf("*"));
+                try {
+                    Verification.addToFile(user.getId() + ";" + res);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try{
+                    user.openPrivateChannel().queue((chan -> {
+                        chan.sendMessage("Votre demande a été **accepté**. Vous avez désormais accès a l'ensemble des salons utiles a votre année.").queue();
+                    }));
+                } catch (Exception e){
+                    System.out.println("Mp fermé par l'utilisateur " + user);
+                }
                 event.getMessage().delete().queue();
                 event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
                         + user.getAsMention() + " a été vérifié par **" + event.getUser().getAsTag() + "**.").queue();
@@ -42,7 +63,7 @@ public class ButtonListener extends ListenerAdapter {
                             "syntaxe `Prenom Nom`. Pour pouvoir être validé, c'est une **obligation**.\n" +
                             "Pour se renommer, il suffit de cliquer en haut a gauche sur **L1 MI 2022/23 S1**, puis *Modifier le profil du " +
                             "serveur* et enfin écrivez votre prénom et nom dans *Pseudo*.\nUne fois fini, vous pouvez refaire la commande " +
-                            "/verify sur le discord et vous serez accepter.").queue();
+                            "/verifyme sur le discord et vous serez accepter.").queue();
                 }));
                 event.getMessage().delete().queue();
                 event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("\uD83D\uDCDD `[" + getDate() + "]` Demande de changement " +

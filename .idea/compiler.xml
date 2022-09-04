@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="UGE_bot" />
+        <module name="UGE-L1-BOT" />
       </profile>
     </annotationProcessing>
   </component>

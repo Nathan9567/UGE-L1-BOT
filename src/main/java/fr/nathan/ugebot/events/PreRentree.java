@@ -24,6 +24,11 @@ public class PreRentree implements EventListener {
     public void onEvent(@NotNull GenericEvent event) {
         if (event instanceof MessageReactionAddEvent) {
             MessageReactionAddEvent e = (MessageReactionAddEvent) event;
+            if(e.getMessageIdLong() == 1014683838103957514L){
+                try {
+                    e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(1003689153877246022L)).queue();
+                }catch (Exception exception){}
+            }
 //            String emoji = e.getEmoji().getFormatted();
 //            long msgid = e.getChannel().getIdLong();
 //            List<String> Grp1 = Arrays.asList("1⃣", "2⃣", "3⃣", "4⃣", "5⃣");
@@ -58,24 +63,28 @@ public class PreRentree implements EventListener {
 
         String line;
         int cmpt = 1;
-        while((line = br.readLine()) != null) {
-            line = line.replace("{", "").replace("}", "");
-            String parts[] = line.split(",");
-            for(String part : parts){
-                //split the reactions data by : to get id and number of reactions
-                String empdata[] = part.split("=");
+        try {
+            while ((line = br.readLine()) != null) {
+                line = line.replace("{", "").replace("}", "");
+                String parts[] = line.split(",");
+                for (String part : parts) {
+                    //split the reactions data by : to get id and number of reactions
+                    String empdata[] = part.split("=");
 
-                String strId = empdata[0].trim();
-                String strName = empdata[1].trim();
+                    String strId = empdata[0].trim();
+                    String strName = empdata[1].trim();
 
-                //set map
-                if (cmpt == 1) {
-                    reactionsMapS1.put(strId, Integer.valueOf(strName));
-                } else if (cmpt == 2) {
-                    reactionsMapS2.put(strId, Integer.valueOf(strName));
+                    //set map
+                    if (cmpt == 1) {
+                        reactionsMapS1.put(strId, Integer.valueOf(strName));
+                    } else if (cmpt == 2) {
+                        reactionsMapS2.put(strId, Integer.valueOf(strName));
+                    }
                 }
+                cmpt++;
             }
-            cmpt++;
+        } catch (ArrayIndexOutOfBoundsException exception){
+            System.out.println("Liste de sessions vide");
         }
         br.close();
     }
@@ -95,7 +104,7 @@ public class PreRentree implements EventListener {
 
             String emoji = getEmojisRoot(e.getEmoji().toString());
             if (reactionMap.containsKey(emoji)) {
-                if (reactionMap.get(emoji) > 16) {
+                if (reactionMap.get(emoji) > 17) {
                     e.getReaction().removeReaction(e.getUser()).queue();
                 } else {
                     reactionMap.replace(emoji, reactionMap.get(emoji) + 1);
