@@ -21,13 +21,8 @@ public class ButtonListener extends ListenerAdapter {
         switch (event.getComponentId()) {
             case "okStudent":
                 event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue();
-                String res = null;
                 String msg = event.getMessage().getContentRaw();
-                Matcher m = Pattern.compile("\\**(.*?)\\**").matcher(msg);
-                while (m.find()){
-                    res = m.group(1);
-                }
-//                String res = msg.substring(msg.indexOf("*")+2, msg.indexOf("*"));
+                String res = msg.substring(msg.length()-9, msg.length()-3);
                 try {
                     Verification.addToFile(user.getId() + ";" + res);
                 } catch (IOException e) {
