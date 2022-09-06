@@ -102,6 +102,7 @@ public class PreRentree implements EventListener {
     private static void sessionReacAdd (MessageReactionAddEvent e, HashMap < String, Integer > reactionMap, Long
     chanId, Long messageId){
         if (e.getChannel().getIdLong() == chanId && !e.getUser().isBot()) {
+            System.out.println(messageId + " " + e.getMember().getEffectiveName() + " " + e.getEmoji().getAsReactionCode());
 
             String emoji = getEmojisRoot(e.getEmoji().toString());
             if (reactionMap.containsKey(emoji)) {

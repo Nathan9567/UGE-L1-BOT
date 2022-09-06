@@ -119,9 +119,9 @@ public class CommandListener extends ListenerAdapter {
                     if (student.getRoles().get(0) != event.getGuild().getRoleById(1003689153877246022L)){
                         try{
                             event.getGuild().addRoleToMember(student, event.getGuild().getRoleById(1003689153877246022L)).queue();
+                            System.out.println(student.getNickname() + " étudiant");
                         } catch (Exception exception){}
                     }
-
                 }
                 break;
 
