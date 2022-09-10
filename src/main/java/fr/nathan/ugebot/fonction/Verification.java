@@ -26,10 +26,27 @@ public class Verification {
         return verified;
     }
 
+    public static void dicToCsv(HashMap<String, String> hashMap, String filepath) throws IOException{
+        FileWriter writer = new FileWriter(filepath);
+
+        writer.write("userid;numetudiant");
+        for () {
+
+        }
+        // writer.write();
+
+    }
+
     public static boolean checkUser(String userId) throws IOException {
         // If already verified return false else return true
         HashMap<String, String> verified = getFile();
-        return verified.containsKey(userId);
+        if (verified.containsKey(userId)) {
+            if (verified.get(userId) == "0"){
+                verified.remove(userId);
+            }
+            return true;
+        }
+        return false;
     }
 
     public static boolean checkStudent(String numEtud) throws IOException {

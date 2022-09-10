@@ -24,14 +24,6 @@ public class ButtonListener extends ListenerAdapter {
                 String msg = event.getMessage().getContentRaw();
                 String res = msg.substring(msg.length()-9, msg.length()-3);
                 try {
-//                    event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue();
-//                    Verification.addToFile(user.getId() + ";" + res);
-//                    user.openPrivateChannel().queue((chan -> {
-//                        chan.sendMessage("Votre demande a été **accepté**. Vous avez désormais accès a l'ensemble des salons utiles a votre année.").queue();
-//                    }));
-//                    event.getMessage().delete().queue();
-//                    event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
-//                            + user.getAsMention() + " a été vérifié par **" + event.getUser().getAsTag() + "**.").queue();
                     if (!Verification.checkUser(user.getId())){
                         if (!Verification.checkStudent(res)){
                             event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue();
