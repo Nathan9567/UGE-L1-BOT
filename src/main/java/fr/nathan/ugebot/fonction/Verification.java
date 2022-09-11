@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Verification {
 
@@ -15,7 +16,7 @@ public class Verification {
         FileReader reader = new FileReader(filename);
         BufferedReader br = new BufferedReader(reader);
 
-        br.read();
+        br.readLine();
         String line;
         while((line = br.readLine()) != null) {
             String[] list = line.split(";");
@@ -30,19 +31,20 @@ public class Verification {
         FileWriter writer = new FileWriter(filepath);
 
         writer.write("userid;numetudiant");
-        for () {
-
+        for (Map.Entry<String, String> entry : hashMap.entrySet()) {
+            writer.append("\n").append(entry.getKey()).append(";").append(entry.getValue());
         }
-        // writer.write();
-
+        writer.close();
     }
 
     public static boolean checkUser(String userId) throws IOException {
         // If already verified return false else return true
         HashMap<String, String> verified = getFile();
         if (verified.containsKey(userId)) {
-            if (verified.get(userId) == "0"){
+            if (verified.get(userId).equals("0")){
                 verified.remove(userId);
+                dicToCsv(verified, "verif.csv");
+                return false;
             }
             return true;
         }

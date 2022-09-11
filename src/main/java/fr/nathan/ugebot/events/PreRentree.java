@@ -1,6 +1,5 @@
 package fr.nathan.ugebot.events;
 
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -9,8 +8,13 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class PreRentree implements EventListener {
 
@@ -24,7 +28,8 @@ public class PreRentree implements EventListener {
     public void onEvent(@NotNull GenericEvent event) {
         if (event instanceof MessageReactionAddEvent) {
             MessageReactionAddEvent e = (MessageReactionAddEvent) event;
-            if(e.getMessageIdLong() == 1014683838103957514L){
+//            System.out.println(e.getReaction().getEmoji().getName());
+            if (e.getMessageIdLong() == 1014683838103957514L){
                 try {
                     e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(1003689153877246022L)).queue();
                 }catch (Exception exception){}
@@ -155,14 +160,6 @@ public class PreRentree implements EventListener {
                 reactionMap.replace(emoji, reactionMap.get(emoji) - 1);
             }
         }
-
-    public static void setMessageId(Integer sessionId, long messageId){
-        if (sessionId == 1) {
-            messageIdS1 = messageId;
-        } else if (messageId == 2) {
-            messageIdS2 = messageId;
-        }
-    }
 
     private static String getEmojisRoot (String emoji){
             String res = "";

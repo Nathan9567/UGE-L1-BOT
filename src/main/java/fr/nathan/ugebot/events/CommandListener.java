@@ -1,48 +1,40 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonction.PermissionError;
 import fr.nathan.ugebot.fonction.Verification;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class CommandListener extends ListenerAdapter {
-
-    private PermissionError permError;
-
-    public CommandListener(PermissionError permError) {
-        this.permError = permError;
-    }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         switch (event.getName()) {
 
-            case "ping":
+            case "ping" -> {
                 long time = System.currentTimeMillis();
                 event.reply("Pong !").setEphemeral(true)
                         .flatMap(v ->
                                 event.getHook().editOriginalFormat("Pong : %d ms", System.currentTimeMillis() - time))
                         .queue();
-                break;
+            }
 
-            case "verify":
+            case "verify" -> {
                 Member mbr = event.getOption("utilisateur").getAsMember();
                 OptionMapping numEtuOption = event.getOption("numetudiant");
-
                 int numetu = 0;
-                if (numEtuOption != null){
+                if (numEtuOption != null) {
                     numetu = numEtuOption.getAsInt();
                 }
-
                 if (mbr != event.getMember()) {
                     boolean hasStudentRole = false;
                     for (Role role : mbr.getRoles()) {
@@ -64,67 +56,61 @@ public class CommandListener extends ListenerAdapter {
                         } catch (Exception ex) {
                             event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                         }
-                    }else{
+                    } else {
                         event.reply("L'utilisateur " + mbr.getAsMention() + " est déjà vérifié.").setEphemeral(true).queue();
                     }
                 } else {
                     event.reply("Tu ne peux pas te vérifier toi même !").setEphemeral(true).queue();
                 }
-                break;
+            }
 
-            case "verifyme":
+            case "verifyme" -> {
                 Integer numEtudiant = event.getOption("numetudiant").getAsInt();
                 event.deferReply().setEphemeral(true).queue();
-                event.getHook().sendMessage("Demande envoyé à l'équipe d'administration.\nUne réponse vous sera donné dans les plus brefs délais.").setEphemeral(true).queue();
+                event.getHook().sendMessage("Demande envoyé à l'équipe d'administration.\n" +
+                                "Une réponse vous sera donné dans les plus brefs délais.")
+                        .setEphemeral(true).queue();
                 event.getUser().openPrivateChannel().queue((chan) -> {
-                    chan.sendMessage("Demande envoyé à l'équipe d'administration.\nUne réponse vous sera donné dans les plus brefs délais.").queue();
+                    chan.sendMessage("Demande envoyé à l'équipe d'administration.\n" +
+                            "Une réponse vous sera donné dans les plus brefs délais.").queue();
                 });
-                event.getGuild().getTextChannelById(1003729944951664782L).sendMessage("✉ `[" + getDate() + "]` L'utilisateur " +
-                        event.getUser().getAsMention() + " a demandé à être vérifié avec le numéro d'étudiant suivant : **" + numEtudiant + "**.")
+                event.getJDA().getGuildById(1003689153768214569L).getTextChannelById(1003729944951664782L)
+                        .sendMessage("✉ `[" + getDate() + "]` L'utilisateur " + event.getUser().getAsMention() +
+                                " a demandé à être vérifié avec le numéro d'étudiant suivant : **" + numEtudiant + "**.")
                         .setActionRow(Button.success("okStudent", "Accepter"), Button.danger("notOkStudent", "Refuser"),
                                 Button.secondary("nameReq", "Prenom/Nom"))
                         .queue();
-                break;
+            }
 
-            case "session":
-                Integer numSession = event.getOption("numero").getAsInt();
-                Long messageID = event.getOption("messageid").getAsLong();
-
-                PreRentree.setMessageId(numSession, messageID);
-
-                event.getJDA().getTextChannelById(event.getChannel().getId()).retrieveMessageById(messageID).queue((msg) -> {
-                    event.deferReply().setEphemeral(true).queue();
-                    msg.addReaction(Emoji.fromFormatted("1⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("2⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("3⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("4⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("5⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("6⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("7⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("8⃣")).queue();
-                    msg.addReaction(Emoji.fromFormatted("9⃣")).queue();
-                    msg.addReaction(Emoji.fromUnicode("\uD83D\uDD1F")).queue();
-                    for (long l : new long[]{1005119634191683694L, 1005119635605164124L, 1005119636687294574L,
-                            1005119637782007899L, 1005119639094825082L, 1005119639975641119L, 1010198262315229194L,
-                            1010198263170879609L, 1010198264932483132L, 1010198266408878110L}) {
-                        msg.addReaction(Emoji.fromCustom(event.getGuild().getEmojiById(l))).queue();
-                    }
-                    event.getHook().editOriginal("Réactions ajoutés au message !").queue();
-                });
-                break;
-
-            case "students":
+            case "students" -> {
                 event.deferReply().setEphemeral(true).queue();
-                for (Member student : event.getGuild().getMembers()){
-                    if (student.getRoles().get(0) != event.getGuild().getRoleById(1003689153877246022L)){
-                        try{
+                for (Member student : event.getGuild().getMembers()) {
+                    if (student.getRoles().get(0) != event.getGuild().getRoleById(1003689153877246022L)) {
+                        try {
                             event.getGuild().addRoleToMember(student, event.getGuild().getRoleById(1003689153877246022L)).queue();
                             System.out.println(student.getNickname() + " étudiant");
-                        } catch (Exception exception){}
+                        } catch (Exception exception) {
+                        }
                     }
                 }
-                break;
+            }
 
+            case "numetu" -> {
+                Member mbrEtu = event.getOption("utilisateur").getAsMember();
+                try {
+                    HashMap<String, String> verifList = Verification.getFile();
+                    if (verifList.containsKey(mbrEtu.getId())) {
+                        event.reply("Le numéro d'étudiant de " + mbrEtu.getAsMention() +
+                                        " est **" + verifList.get(mbrEtu.getId()) + "**.")
+                                .setEphemeral(true).queue();
+                    } else {
+                        event.reply("Action impossible. L'utilisateur " + mbrEtu.getAsMention() +
+                                " n'est pas vérifié !").setEphemeral(true).queue();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
