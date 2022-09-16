@@ -2,7 +2,6 @@ package fr.nathan.ugebot.events;
 
 import fr.nathan.ugebot.fonction.Verification;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -10,9 +9,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
+
+import static fr.nathan.ugebot.fonction.DateFonction.getDate;
 
 public class CommandListener extends ListenerAdapter {
 
@@ -48,6 +47,7 @@ public class CommandListener extends ListenerAdapter {
                                 });
                                 Verification.addToFile(mbr.getId() + ";" + numetu);
                             } catch (Exception ex) {
+                                event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                                 event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                             }
                         } else {
@@ -109,23 +109,5 @@ public class CommandListener extends ListenerAdapter {
                 }
             }
         }
-    }
-
-    private String getDate(){
-        Calendar cal = Calendar.getInstance(Locale.FRANCE);
-        String heure = "" + cal.get(Calendar.HOUR_OF_DAY);
-        String min = "" + cal.get(Calendar.MINUTE);
-        String sec = "" + cal.get(Calendar.SECOND);
-
-        if (heure.length() == 1) {
-            heure = 0 + heure;
-        }
-        if (min.length() == 1) {
-            min = 0 + min;
-        }
-        if (sec.length() == 1) {
-            sec = 0 + sec;
-        }
-        return heure + ":" + min + ":" + sec;
     }
 }

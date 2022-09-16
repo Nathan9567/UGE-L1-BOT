@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import static fr.nathan.ugebot.fonction.DateFonction.getDate;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -74,21 +74,4 @@ public class ButtonListener extends ListenerAdapter {
         }
     }
 
-    private String getDate(){
-        Calendar cal = Calendar.getInstance(Locale.FRANCE);
-        String heure = "" + cal.get(Calendar.HOUR_OF_DAY);
-        String min = "" + cal.get(Calendar.MINUTE);
-        String sec = "" + cal.get(Calendar.SECOND);
-
-        if (heure.length() == 1) {
-            heure = 0 + heure;
-        }
-        if (min.length() == 1) {
-            min = 0 + min;
-        }
-        if (sec.length() == 1) {
-            sec = 0 + sec;
-        }
-        return heure + ":" + min + ":" + sec;
-    }
 }
