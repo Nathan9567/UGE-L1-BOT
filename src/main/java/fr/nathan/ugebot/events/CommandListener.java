@@ -36,28 +36,25 @@ public class CommandListener extends ListenerAdapter {
                     numetu = numEtuOption.getAsInt();
                 }
                 if (mbr != event.getMember()) {
-                    boolean hasStudentRole = false;
-                    for (Role role : mbr.getRoles()) {
-                        if (role.equals(event.getGuild().getRoleById(1012973566104453170L))) {
-                            hasStudentRole = true;
+                    try {
+                        if (!Verification.checkUser(mbr.getId())) {
+                            try {
+                                event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1012973566104453170L)).queue();
+                                event.reply("L'utilisateur " + mbr.getAsMention() + " est désormais vérifié.").setEphemeral(true).queue();
+                                event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
+                                        + mbr.getAsMention() + " a été vérifié **manuellement** par **" + event.getUser().getAsTag() + "**.").queue();
+                                mbr.getUser().openPrivateChannel().queue((chan) -> {
+                                    chan.sendMessage("Vous venez d'être vérifié par " + event.getUser().getAsTag() + ".").queue();
+                                });
+                                Verification.addToFile(mbr.getId() + ";" + numetu);
+                            } catch (Exception ex) {
+                                event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
+                            }
+                        } else {
+                            event.reply("L'utilisateur " + mbr.getAsMention() + " est déjà vérifié.").setEphemeral(true).queue();
                         }
-                    }
-
-                    if (!hasStudentRole) {
-                        try {
-                            event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1012973566104453170L)).queue();
-                            event.reply("L'utilisateur " + mbr.getAsMention() + " est désormais vérifié.").setEphemeral(true).queue();
-                            event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
-                                    + mbr.getAsMention() + " a été vérifié **manuellement** par **" + event.getUser().getAsTag() + "**.").queue();
-                            mbr.getUser().openPrivateChannel().queue((chan) -> {
-                                chan.sendMessage("Vous venez d'être vérifié par " + event.getUser().getAsTag() + ".").queue();
-                            });
-                            Verification.addToFile(mbr.getId() + ";" + numetu);
-                        } catch (Exception ex) {
-                            event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
-                        }
-                    } else {
-                        event.reply("L'utilisateur " + mbr.getAsMention() + " est déjà vérifié.").setEphemeral(true).queue();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 } else {
                     event.reply("Tu ne peux pas te vérifier toi même !").setEphemeral(true).queue();
