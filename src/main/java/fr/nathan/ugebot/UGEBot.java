@@ -15,10 +15,10 @@ public class UGEBot {
         JDA api = JDABuilder.createDefault("ODgzMzgwNTI3NDE0MDE4MDc4.GWBo-b.2kkmxnTZetoWmlJDtf9Bams-9AJSthvDcG12jE").build();
 
         api.addEventListener(new CommandListener());
-        api.addEventListener(new PreRentree());
+//        api.addEventListener(new PreRentree());
         api.addEventListener(new ButtonListener());
         api.addEventListener(new JoinListener());
-        api.addEventListener(new SessionListener());
+//        api.addEventListener(new SessionListener());
         api.addEventListener(new WelcomeListener());
 
         api.upsertCommand("ping", "Calcul ta latence avec le robot").queue();
@@ -32,8 +32,6 @@ public class UGEBot {
                 .addOption(OptionType.INTEGER, "numero", "Numéro de session", true)
                 .addOption(OptionType.STRING, "messageid", "Identifiant du message", true)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
-        api.upsertCommand("students", "Met le rôle étudiant à tout le discord !")
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
         api.upsertCommand("numetu", "Obtenir le numéro d'étudiant d'une personne")
                 .addOption(OptionType.USER, "utilisateur", "Utilisateur souhaité", true)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
@@ -42,6 +40,6 @@ public class UGEBot {
 
         api.awaitReady();
 
-        SessionListener.initEmojisRole();
+//        SessionListener.initEmojisRole();
     }
 }

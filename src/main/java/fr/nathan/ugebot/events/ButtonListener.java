@@ -4,6 +4,7 @@ import fr.nathan.ugebot.fonction.Verification;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -26,7 +27,8 @@ public class ButtonListener extends ListenerAdapter {
                 try {
                     if (!Verification.checkUser(user.getId())) {
                         if (!Verification.checkStudent(res)) {
-                            event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue();
+                            event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
+                            event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1003689153877246022L)).queue(); // étudiant
                             Verification.addToFile(user.getId() + ";" + res);
                             user.openPrivateChannel().queue((chan -> {
                                 chan.sendMessage("Votre demande a été **accepté**. Vous avez désormais accès a l'ensemble des salons utiles a votre année.").queue();
@@ -79,8 +81,22 @@ public class ButtonListener extends ListenerAdapter {
                 event.reply("Votre message a été pris en compte, un administrateur " +
                         "va revenir vers vous dans les plus brefs délais.").setEphemeral(true).queue();
                 event.getGuild().getTextChannelById(1022146124959719594L).sendMessage("\uD83D\uDCDD `[" + getDate() + "]` " +
-                        event.getUser().getAsTag() + " a demandé de l'aide. Merci de bien vouloir le contacter au plus vite. " +
-                        event.getGuild().getRoleById(1003689153877246026L).getAsMention()).queue();
+                        event.getUser().getAsMention() + " a demandé de l'aide. Merci de bien vouloir le contacter au plus vite. " +
+                        event.getGuild().getRoleById(1003689153877246026L).getAsMention())
+                        .setActionRow(Button.success("helpReq", "Prise en charge")).queue();
+            }
+            case "helpReq" -> {
+                event.getMessage().editMessage("**Demande d'aide prise en charge par " + event.getUser().getAsMention() + ":**\n"
+                                + event.getMessage().getContentRaw())
+                        .setActionRow(Button.danger("helpClose", "Clôturer")).queue();
+                event.reply("Tu as bien pris en charge l'étudiant.").setEphemeral(true).queue();
+            }
+            case "helpClose" -> {
+                event.getChannel().sendMessage("✅ `[" + getDate() + "]` La demande de "
+                        + event.getMessage().getMentions().getUsers().get(1).getAsMention()
+                        + " a été cloturé par " + event.getUser().getAsMention()).queue();
+                event.getMessage().delete().queue();
+                event.reply("La demande a été cloturé !").setEphemeral(true).queue();
             }
         }
     }
