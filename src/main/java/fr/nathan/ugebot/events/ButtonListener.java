@@ -1,6 +1,6 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonction.Verification;
+import fr.nathan.ugebot.fonctions.Verification;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static fr.nathan.ugebot.fonction.DateFonction.getDate;
+import static fr.nathan.ugebot.fonctions.DateFonction.getDate;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -27,18 +27,18 @@ public class ButtonListener extends ListenerAdapter {
                 try {
                     if (!Verification.checkUser(user.getId())) {
                         if (!Verification.checkStudent(res)) {
-                            event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
-                            event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1003689153877246022L)).queue(); // étudiant
-                            Verification.addToFile(user.getId() + ";" + res);
+                            event.getGuild().addRoleToMember(user, event.getGuild().getRolesByName("étudiant(e)", true).get(0)).queue(); // étudiant
+                            //event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
+                            Verification.addToFile("verif.csv", user.getId() + ";" + res);
                             user.openPrivateChannel().queue((chan -> {
                                 chan.sendMessage("Votre demande a été **accepté**. Vous avez désormais accès a l'ensemble des salons utiles a votre année.").queue();
                             }));
                             event.getMessage().delete().queue();
-                            event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
+                            event.getGuild().getTextChannelsByName("verifications-logs",true).get(0).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
                                     + user.getAsMention() + " a été vérifié par **" + event.getUser().getAsTag() + "**.").queue();
                         } else {
                             event.getMessage().delete().queue();
-                            event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("Un utilisateur a" +
+                            event.getGuild().getTextChannelsByName("verifications-logs",true).get(0).sendMessage("Un utilisateur a" +
                                     " déjà été vérifié avec le numéro d'étudiant : **" + res + "** ! (Demande de " + user.getAsMention() + ")").queue();
                         }
                     } else {
@@ -59,7 +59,7 @@ public class ButtonListener extends ListenerAdapter {
                             "Si celle-ci est de nouveau rejeté, merci de contacter un administrateur en privé.").queue();
                 }));
                 event.getMessage().delete().queue();
-                event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("❌ `[" + getDate() + "]` L'utilisateur "
+                event.getGuild().getTextChannelsByName("verifications-logs",true).get(0).sendMessage("❌ `[" + getDate() + "]` L'utilisateur "
                         + user.getAsMention() + " a été refusé par **" + event.getUser().getAsTag() + "**.").queue();
             }
             case "nameReq" -> {
@@ -71,7 +71,7 @@ public class ButtonListener extends ListenerAdapter {
                             "/verifyme sur le discord et vous serez accepter.").queue();
                 }));
                 event.getMessage().delete().queue();
-                event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("\uD83D\uDCDD `[" + getDate() + "]` Demande de changement " +
+                event.getGuild().getTextChannelsByName("verifications-logs",true).get(0).sendMessage("\uD83D\uDCDD `[" + getDate() + "]` Demande de changement " +
                         "de pseudo envoyé à " + user.getAsMention() + " par **" + event.getUser().getAsTag() + "**.").queue();
             }
             case "help" -> {
@@ -80,9 +80,9 @@ public class ButtonListener extends ListenerAdapter {
                         " va revenir vers vous dans les plus brefs délais.").queue()));
                 event.reply("Votre message a été pris en compte, un administrateur " +
                         "va revenir vers vous dans les plus brefs délais.").setEphemeral(true).queue();
-                event.getGuild().getTextChannelById(1022146124959719594L).sendMessage("\uD83D\uDCDD `[" + getDate() + "]` " +
+                event.getGuild().getTextChannelsByName("demande-d-aide", true).get(0).sendMessage("\uD83D\uDCDD `[" + getDate() + "]` " +
                         event.getUser().getAsMention() + " a demandé de l'aide. Merci de bien vouloir le contacter au plus vite. " +
-                        event.getGuild().getRoleById(1003689153877246026L).getAsMention())
+                        event.getGuild().getRolesByName("Administrateur Discord", true).get(0).getAsMention())
                         .setActionRow(Button.success("helpReq", "Prise en charge")).queue();
             }
             case "helpReq" -> {

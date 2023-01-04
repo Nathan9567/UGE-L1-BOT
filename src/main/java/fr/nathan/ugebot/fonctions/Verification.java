@@ -1,4 +1,4 @@
-package fr.nathan.ugebot.fonction;
+package fr.nathan.ugebot.fonctions;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -56,10 +56,8 @@ public class Verification {
         return verified.containsValue(numEtud);
     }
 
-    public static void addToFile(String append) throws IOException {
-        String filename = "verif.csv";
-
-        FileWriter writer = new FileWriter(filename, true);
+    public static void addToFile(String filepath, String append) throws IOException {
+        FileWriter writer = new FileWriter(filepath, true);
 
         writer.write("\n" + append);
         writer.close();

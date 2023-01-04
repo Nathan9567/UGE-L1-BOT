@@ -1,4 +1,4 @@
-package fr.nathan.ugebot.fonction;
+package fr.nathan.ugebot.fonctions;
 
 import java.util.Calendar;
 import java.util.Locale;

@@ -1,9 +1,7 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonction.Verification;
-import net.dv8tion.jda.api.EmbedBuilder;
+import fr.nathan.ugebot.fonctions.Verification;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,11 +9,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
-import static fr.nathan.ugebot.fonction.DateFonction.getDate;
+import static fr.nathan.ugebot.fonctions.DateFonction.getDate;
 
 public class CommandListener extends ListenerAdapter {
 
@@ -42,15 +40,15 @@ public class CommandListener extends ListenerAdapter {
                     try {
                         if (!Verification.checkUser(mbr.getId())) {
                             try {
-                                event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
-                                event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1003689153877246022L)).queue(); // étudiant
+                                // event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
+                                event.getGuild().addRoleToMember(mbr, event.getGuild().getRolesByName("étudiant(e)", true).get(0)).queue(); // étudiant
                                 event.reply("L'utilisateur " + mbr.getAsMention() + " est désormais vérifié.").setEphemeral(true).queue();
-                                event.getGuild().getTextChannelById(1010540662581641337L).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
+                                event.getGuild().getTextChannelsByName("verifications-logs",true).get(0).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
                                         + mbr.getAsMention() + " a été vérifié **manuellement** par **" + event.getUser().getAsTag() + "**.").queue();
                                 mbr.getUser().openPrivateChannel().queue((chan) -> {
                                     chan.sendMessage("Vous venez d'être vérifié par " + event.getUser().getAsTag() + ".").queue();
                                 });
-                                Verification.addToFile(mbr.getId() + ";" + numetu);
+                                Verification.addToFile("verif.csv", mbr.getId() + ";" + numetu);
                             } catch (Exception ex) {
                                 event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                                 event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
@@ -78,7 +76,7 @@ public class CommandListener extends ListenerAdapter {
                             chan.sendMessage("Demande envoyé à l'équipe d'administration.\n" +
                                     "Une réponse vous sera donné dans les plus brefs délais.").queue();
                         });
-                        event.getJDA().getGuildById(1003689153768214569L).getTextChannelById(1003729944951664782L)
+                        event.getGuild().getTextChannelsByName("verifications", true).get(0)
                                 .sendMessage("✉ `[" + getDate() + "]` L'utilisateur " + event.getUser().getAsMention() +
                                         " a demandé à être vérifié avec le numéro d'étudiant suivant : **" + numEtudiant + "**.")
                                 .setActionRow(Button.success("okStudent", "Accepter"), Button.danger("notOkStudent", "Refuser"),
@@ -105,6 +103,56 @@ public class CommandListener extends ListenerAdapter {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            case "poll" -> {
+                String qst = event.getOption("question").getAsString();
+                OptionMapping choicesOption = event.getOption("choices");
+                StringBuilder message = new StringBuilder(qst + "\n\n");
+                if (choicesOption == null) {
+                    event.reply("Sondage créé").setEphemeral(true).queue();
+                    event.getChannel().sendMessage(message).queue((msg) -> {
+                        msg.addReaction(Emoji.fromUnicode("✅")).queue();
+                        msg.addReaction(Emoji.fromUnicode("❌")).queue();
+                    });
+                    break;
+                }
+                if (!choicesOption.getAsString().contains(";")) {
+                    event.reply("Merci d'insérer au moins 2 choix en respectant la syntaxe " +
+                                    "décrite par la description de l'option.").setEphemeral(true).queue();
+                    break;
+                }
+                String[] choices = choicesOption.getAsString().split(";");
+
+                List<String> nbr = List.of("1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "\uD83D\uDD1F",
+                        "11", "12", "13", "14", "15", "16", "17", "18", "19", "20");
+                int i = 0;
+                for (String choix : choices) {
+                    if (i<10) {
+                        message.append(nbr.get(i));
+                    } else {
+                        message.append(event.getGuild().getEmojisByName(nbr.get(i), true)
+                                .get(0).getFormatted());
+                    }
+                    message.append(" ").append(choix).append("\n");
+                    i++;
+                    if (i == 20){
+                        break;
+                    }
+                }
+
+                event.reply("Sondage créé").setEphemeral(true).queue();
+                event.getChannel().sendMessage(message).queue((msg) -> {
+                    int nb = 0;
+                    while (nb != choices.length) {
+                        if (nb<10) {
+                            msg.addReaction(Emoji.fromFormatted(nbr.get(nb))).queue();
+                        } else {
+                            msg.addReaction(event.getGuild().getEmojisByName(nbr.get(nb), true).get(0)).queue();
+                        }
+                        nb++;
+                    }
+                });
             }
         }
     }

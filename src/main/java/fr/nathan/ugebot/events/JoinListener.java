@@ -1,16 +1,27 @@
 package fr.nathan.ugebot.events;
 
-import net.dv8tion.jda.api.events.GenericEvent;
+import fr.nathan.ugebot.fonctions.Verification;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
-public class JoinListener implements EventListener {
+import java.io.IOException;
+
+public class JoinListener extends ListenerAdapter {
 
     @Override
-    public void onEvent(GenericEvent event) {
-        if (event instanceof GuildMemberJoinEvent){
-            GuildMemberJoinEvent e = (GuildMemberJoinEvent) event;
-            e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(1003689153877246022L)).queue();
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        try {
+            if (Verification.checkUser(event.getUser().getId())) {
+                event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRolesByName("étudiant(e)", true).get(0)).queue();
+            } else {
+                event.getUser().openPrivateChannel().queue((chan -> chan.sendMessage("Bonjour, tu n'as surement pas été vérifié (ou sans numéro d'étudiant)" +
+                        "lors du S1 cette année.\nPar conséquent, merci de passer par le salon " +
+                        event.getGuild().getTextChannelsByName("arrivée", true).get(0).getAsMention() +
+                        " pour remédier à cela ! Sans cela, tu n'auras pas accès au Discord :wink:").queue()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
