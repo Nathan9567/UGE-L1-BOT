@@ -1,4 +1,4 @@
-package fr.nathan.ugebot.fonctions;
+package fr.nathan.ugebot.functions;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;

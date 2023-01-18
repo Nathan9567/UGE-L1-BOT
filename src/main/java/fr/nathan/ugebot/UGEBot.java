@@ -1,9 +1,6 @@
 package fr.nathan.ugebot;
 
-import fr.nathan.ugebot.events.ButtonListener;
-import fr.nathan.ugebot.events.CommandListener;
-import fr.nathan.ugebot.events.JoinListener;
-import fr.nathan.ugebot.events.WelcomeListener;
+import fr.nathan.ugebot.events.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
@@ -12,12 +9,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class UGEBot {
 
 
     public static void main(String[] args) throws Exception {
         // UGE BOT
-        JDA api = JDABuilder.createDefault("ODgzMzgwNTI3NDE0MDE4MDc4.GWBo-b.2kkmxnTZetoWmlJDtf9Bams-9AJSthvDcG12jE")
+        String token = Files.readString(Paths.get("token.txt"));
+        JDA api = JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build();
 //        api.addEventListener(new PreRentree());
@@ -26,6 +27,7 @@ public class UGEBot {
         api.addEventListener(new ButtonListener());
         api.addEventListener(new JoinListener());
         api.addEventListener(new WelcomeListener());
+        api.addEventListener(new UpdateGroups());
 //        api.addEventListener(new StatsListener());
 
         api.upsertCommand("ping", "Calcul ta latence avec le robot").queue();
@@ -59,10 +61,18 @@ public class UGEBot {
                 .addOption(OptionType.STRING, "choices", "Mettez vos choix à la suite" +
                         "séparés par un \";\". Si il n'y a pas de choix, cela est un oui/non.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
+
+        // Commande update groupe
+        SubcommandData updateData = new SubcommandData("update", "Mettre à jour les groupes.");
+        api.upsertCommand("role", "Mettre à jour les groupes.")
+                .addSubcommands(updateData)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
+
         api.awaitReady();
 
-        if (System.console().readLine().equals("restart"))
+        if (System.console().readLine().equals("restart")) {
             System.exit(0);
+        }
 
 //        SessionListener.initEmojisRole();
     }

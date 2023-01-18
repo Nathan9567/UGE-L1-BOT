@@ -1,6 +1,7 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonctions.Verification;
+import fr.nathan.ugebot.functions.UsefulFunction;
+import fr.nathan.ugebot.functions.Verification;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import static fr.nathan.ugebot.fonctions.DateFonction.getDate;
+import static fr.nathan.ugebot.functions.DateFunction.getDate;
 
 public class CommandListener extends ListenerAdapter {
 
@@ -40,8 +41,7 @@ public class CommandListener extends ListenerAdapter {
                     try {
                         if (!Verification.checkUser(mbr.getId())) {
                             try {
-                                // event.getGuild().addRoleToMember(mbr, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
-                                event.getGuild().addRoleToMember(mbr, event.getGuild().getRolesByName("étudiant(e)", true).get(0)).queue(); // étudiant
+                                UsefulFunction.addRole(event.getGuild(), mbr.getId(), "étudiant(e)");
                                 event.reply("L'utilisateur " + mbr.getAsMention() + " est désormais vérifié.").setEphemeral(true).queue();
                                 event.getGuild().getTextChannelsByName("verifications-logs",true).get(0).sendMessage("✅ `[" + getDate() + "]` L'utilisateur "
                                         + mbr.getAsMention() + " a été vérifié **manuellement** par **" + event.getUser().getAsTag() + "**.").queue();
@@ -50,7 +50,6 @@ public class CommandListener extends ListenerAdapter {
                                 });
                                 Verification.addToFile("verif.csv", mbr.getId() + ";" + numetu);
                             } catch (Exception ex) {
-                                event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                                 event.reply("L'utilisateur n'est pas sur le discord.").setEphemeral(true).queue();
                             }
                         } else {
@@ -65,7 +64,7 @@ public class CommandListener extends ListenerAdapter {
             }
 
             case "verifyme" -> {
-                Integer numEtudiant = event.getOption("numetudiant").getAsInt();
+                int numEtudiant = event.getOption("numetudiant").getAsInt();
                 try {
                     if (!Verification.checkUser(event.getUser().getId())) {
                         event.deferReply().setEphemeral(true).queue();

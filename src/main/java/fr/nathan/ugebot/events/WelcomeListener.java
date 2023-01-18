@@ -1,6 +1,5 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonctions.Verification;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageType;
@@ -98,7 +97,7 @@ public class WelcomeListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
         if (e.getChannel().getName().equals("verifyme")) {
-            if (!e.getMessage().getType().equals(MessageType.SLASH_COMMAND)){
+            if (!e.getMessage().getType().equals(MessageType.SLASH_COMMAND) && !e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
                 e.getMessage().delete().queue();
             }
         }

@@ -1,6 +1,7 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonctions.Verification;
+import fr.nathan.ugebot.functions.UsefulFunction;
+import fr.nathan.ugebot.functions.Verification;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static fr.nathan.ugebot.fonctions.DateFonction.getDate;
+import static fr.nathan.ugebot.functions.DateFunction.getDate;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -27,8 +28,7 @@ public class ButtonListener extends ListenerAdapter {
                 try {
                     if (!Verification.checkUser(user.getId())) {
                         if (!Verification.checkStudent(res)) {
-                            event.getGuild().addRoleToMember(user, event.getGuild().getRolesByName("étudiant(e)", true).get(0)).queue(); // étudiant
-                            //event.getGuild().addRoleToMember(user, event.getGuild().getRoleById(1012973566104453170L)).queue(); // vérifié
+                            UsefulFunction.addRole(event.getGuild(), user.getId(), "étudiant(e)");
                             Verification.addToFile("verif.csv", user.getId() + ";" + res);
                             user.openPrivateChannel().queue((chan -> {
                                 chan.sendMessage("Votre demande a été **accepté**. Vous avez désormais accès a l'ensemble des salons utiles a votre année.").queue();

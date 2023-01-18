@@ -1,9 +1,9 @@
-package fr.nathan.ugebot.fonctions;
+package fr.nathan.ugebot.functions;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-public class DateFonction {
+public class DateFunction {
 
     public static String getDate(){
         Calendar cal = Calendar.getInstance(Locale.FRANCE);

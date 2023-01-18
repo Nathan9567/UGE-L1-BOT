@@ -1,4 +1,4 @@
-package fr.nathan.ugebot.fonctions;
+package fr.nathan.ugebot.functions;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

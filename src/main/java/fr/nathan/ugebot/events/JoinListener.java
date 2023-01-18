@@ -1,6 +1,6 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.fonctions.Verification;
+import fr.nathan.ugebot.functions.Verification;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
