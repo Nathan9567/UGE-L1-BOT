@@ -82,6 +82,9 @@ public class CommandListener extends ListenerAdapter {
                                 .setActionRow(Button.success("okStudent", "Accepter"), Button.danger("notOkStudent", "Refuser"),
                                         Button.secondary("nameReq", "Prenom/Nom"))
                                 .queue();
+                    } else {
+                        event.deferReply().setEphemeral(true).queue();
+                        event.getHook().sendMessage("Vous êtes déjà vérifié !").queue();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
