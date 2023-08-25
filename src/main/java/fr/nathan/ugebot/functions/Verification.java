@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Verification {
 
     public static HashMap<String, String> getFile() throws IOException {
-//        ArrayList<String> enseignants = new ArrayList<>();
         HashMap<String, String> verified = new HashMap<>();
         String filename = "verif.csv";
 
@@ -18,35 +18,23 @@ public class Verification {
 
         br.readLine();
         String line;
-        while((line = br.readLine()) != null) {
-//            if (line.equals("Enseignants:")) break;
+        while ((line = br.readLine()) != null) {
             String[] list = line.split(";");
             String userid = list[0];
             String numetu = list[1];
             verified.put(userid, numetu);
         }
-/*
-        while ((line = br.readLine()) != null) {
-            if (line.equals("Tuteurs:")) break;
-            enseignants.add(line);
-        }
-
-        while ((line = br.readLine()) != null) {
-            enseignants.add(line);
-        }
-        br.close();*/
+        br.close();
         return verified;
     }
 
-    public static void dicToCsv(HashMap<String, String> hashMap, String filepath) throws IOException{
+    public static void dicToCsv(HashMap<String, String> hashMap, String filepath) throws IOException {
         FileWriter writer = new FileWriter(filepath);
 
-         writer.write("userid;numetudiant");
-//        writer.write("Etudiants:");
+        writer.write("userid;numetudiant");
         for (Map.Entry<String, String> entry : hashMap.entrySet()) {
             writer.append("\n").append(entry.getKey()).append(";").append(entry.getValue());
         }
-//        writer.write("Enseignants:");
         writer.close();
     }
 
@@ -54,7 +42,7 @@ public class Verification {
         // If already verified return false else return true
         HashMap<String, String> verified = getFile();
         if (verified.containsKey(userId)) {
-            if (verified.get(userId).equals("0")){
+            if (verified.get(userId).equals("0")) {
                 verified.remove(userId);
                 dicToCsv(verified, "verif.csv");
                 return false;

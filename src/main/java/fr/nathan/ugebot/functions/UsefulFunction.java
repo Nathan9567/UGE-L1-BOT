@@ -8,7 +8,7 @@ public class UsefulFunction {
 
     public static void addRole(Guild g, String userid, String role) {
         if (!Objects.requireNonNull(g.getMemberById(userid)).getRoles().contains(g.getRolesByName(role, true).get(0))) {
-            g.addRoleToMember(g.getMemberById(userid), g.getRolesByName(role, true).get(0)).queue();
+            g.addRoleToMember(Objects.requireNonNull(g.getMemberById(userid)), g.getRolesByName(role, true).get(0)).queue();
         }
     }
 }

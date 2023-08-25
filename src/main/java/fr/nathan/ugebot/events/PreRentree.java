@@ -1,175 +1,165 @@
 package fr.nathan.ugebot.events;
 
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class PreRentree implements EventListener {
+import static fr.nathan.ugebot.functions.JsonManager.*;
 
-    public static HashMap<String, Integer> reactionsMapS1 = new HashMap<String, Integer>();
-    public static HashMap<String, Integer> reactionsMapS2 = new HashMap<String, Integer>();
-    private Long chanId = 1009474765913862295L;
-    private static Long messageIdS1 = 1010523177190957107L;
-    private static Long messageIdS2 = 1010523262863802469L;
+public class PreRentree extends ListenerAdapter {
 
     @Override
-    public void onEvent(@NotNull GenericEvent event) {
-        if (event instanceof MessageReactionAddEvent) {
-            MessageReactionAddEvent e = (MessageReactionAddEvent) event;
-//            System.out.println(e.getReaction().getEmoji().getName());
-            if (e.getMessageIdLong() == 1014683838103957514L){
-                try {
-                    e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(1003689153877246022L)).queue();
-                }catch (Exception exception){}
-            }
-//            String emoji = e.getEmoji().getFormatted();
-//            long msgid = e.getChannel().getIdLong();
-//            List<String> Grp1 = Arrays.asList("1⃣", "2⃣", "3⃣", "4⃣", "5⃣");
-//            List<String> Grp2 = Arrays.asList("6⃣", "7⃣", "8⃣", "9⃣", "\uD83D\uDD1F");
-//            List<String> Grp3 = Arrays.asList("<:11:1005119634191683694>", "<:12:1005119635605164124>", "<:13:1005119636687294574>", "<:14:1005119637782007899>", "<:15:1005119639094825082>");
-//            List<String> Grp4 = Arrays.asList("<:16:1005119639975641119>", "<:17:1010198262315229194>", "<:18:1010198263170879609>", "<:19:1010198264932483132>", "<:20:1010198266408878110>");
-            try {
-                getReactionFile();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            if (e.getMessageIdLong() == messageIdS1){
-                sessionReacAdd(e, reactionsMapS1, chanId, messageIdS1);
-            } else if (e.getMessageIdLong() == messageIdS2) {
-                sessionReacAdd(e, reactionsMapS2, chanId, messageIdS2);
-            }
-        }
+    public void onGuildReady(GuildReadyEvent event) {
+        JDA api = event.getJDA();
 
-        if (event instanceof MessageReactionRemoveEvent) {
-            MessageReactionRemoveEvent e = (MessageReactionRemoveEvent) event;
-            if (e.getMessageIdLong() == messageIdS1){
-                sessionReacDel(e, reactionsMapS1, chanId);
-            } else if (e.getMessageIdLong() == messageIdS2) {
-                sessionReacDel(e, reactionsMapS2, chanId);
+        // Gérer les inscriptions aux sessions de pré-rentrée
+        api.upsertCommand("partie", "Permet l'incription ou la désincription aux parties de pré-rentrée")
+                .addSubcommands(new SubcommandData("info", "Liste les parties dans lesquels vous êtes inscrits"))
+                .addSubcommands(new SubcommandData("inscription", "Inscription aux parties de pré-rentrée")
+                        .addOption(OptionType.STRING, "partie", "Partie de pré-rentrée", true, true)
+                        .addOption(OptionType.INTEGER, "tp", "TP voulu pour la partie", true, true))
+                .addSubcommands(new SubcommandData("desinscription", "Se désincrire d'une partie de pré-rentrée")
+                        .addOption(OptionType.STRING, "partie", "Partie de pré-rentrée", true, true))
+                .queue();
+
+        // Obtenir les inscriptions aux sessions de pré-rentrée
+        api.upsertCommand("inscrits", "Obtenir les inscrits aux sessions de pré-rentrée par partie et par TP")
+                .addOption(OptionType.STRING, "partie", "Partie de pré-rentrée", true, true)
+                .addOption(OptionType.INTEGER, "tp", "TP voulu pour la partie", true, true)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
+    }
+
+    @Override
+    public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
+        String[] parties = {"ent", "terminal", "outilogique"};
+        if (event.getName().equals("partie") || event.getName().equals("inscrits")) {
+            if (event.getFocusedOption().getName().equals("partie")) {
+                List<Command.Choice> options = Stream.of(parties)
+                        .filter(word -> word.startsWith(event.getFocusedOption().getValue())) // only display words that start with the user's current input
+                        .map(word -> new Command.Choice(word, word)) // map the words to choices
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            if (event.getFocusedOption().getName().equals("tp")) {
+                Integer[] tps = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                        11, 12, 13, 14, 15, 16, 17};
+                String partie = Objects.requireNonNull(event.getOption("partie")).getAsString();
+                List<Command.Choice> options = Stream.of(tps)
+                        .filter(word -> word.toString().startsWith(event.getFocusedOption().getValue())) // only display words that start with the user's current input
+                        .filter(word -> getListSizeFromMap("sessions.json", partie, word) < 20)
+                        .map(word -> new Command.Choice(String.valueOf(word), word)) // map the words to choices
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
             }
         }
     }
 
-    public static void getReactionFile() throws IOException {
-        String fileName = "sessions.txt";
+    @Override
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        String filePath = "sessions.json";
 
-        FileReader reader = new FileReader(fileName);
-        BufferedReader br = new BufferedReader(reader);
+        if (event.getName().equals("partie")) {
+            if (Objects.equals(event.getSubcommandName(), "info")) {
+                Integer ent = findKeyContainingId(filePath, "ent", event.getUser().getIdLong());
+                Integer terminal = findKeyContainingId(filePath, "terminal", event.getUser().getIdLong());
+                Integer outilogique = findKeyContainingId(filePath, "outilogique", event.getUser().getIdLong());
 
-        reactionsMapS1.clear();
-        reactionsMapS2.clear();
+                StringBuilder sb = new StringBuilder();
 
-        String line;
-        int cmpt = 1;
-        while ((line = br.readLine()) != null) {
-            line = line.replace("{", "").replace("}", "");
-            String parts[] = line.split(",");
-            for (String part : parts) {
-                //split the reactions data by : to get id and number of reactions
-                String empdata[] = part.split("=");
+                if (ent != null || terminal != null || outilogique != null)
+                    sb.append("Vous êtes inscrit aux parties suivantes : ");
+                else
+                    sb.append("Vous n'êtes inscrit à aucune partie ! Pensez à vous inscrire !");
+                if (ent != null)
+                    sb.append("\n__ENT :__ **TP ").append(ent).append("**");
+                if (terminal != null)
+                    sb.append("\n__Terminal :__ **TP ").append(terminal).append("**");
+                if (outilogique != null)
+                    sb.append("\n__Outilogique :__ **TP ").append(outilogique).append("**");
 
-                String strId = empdata[0].trim();
-                String strName = empdata[1].trim();
+                event.reply(sb.toString()).setEphemeral(true).queue();
 
-                //set map
-                if (cmpt == 1) {
-                    reactionsMapS1.put(strId, Integer.valueOf(strName));
-                } else if (cmpt == 2) {
-                    reactionsMapS2.put(strId, Integer.valueOf(strName));
+            } else if (Objects.equals(event.getSubcommandName(), "inscription")) {
+                int nb = Objects.requireNonNull(event.getOption("tp")).getAsInt();
+                if (nb < 1 || nb > 17) {
+                    event.reply("Le TP doit être compris entre 1 et 17 !").setEphemeral(true).queue();
+                    return;
                 }
-            }
-            cmpt++;
-        }
-        br.close();
-    }
 
-    public static void setReactionFile() throws IOException {
-        String fileName = "sessions.txt";
+                String partie = Objects.requireNonNull(event.getOption("partie")).getAsString();
+                if (!partie.equals("ent") && !partie.equals("terminal") && !partie.equals("outilogique")) {
+                    event.reply("La partie doit être \"ent\", \"terminal\" ou \"outilogique\" !").setEphemeral(true).queue();
+                    return;
+                }
 
-        FileWriter fw = new FileWriter(fileName);
+                // si l'utilisateur est déjà inscrit à un créneau
+                Integer idTP = findKeyContainingId(filePath, partie, event.getUser().getIdLong());
+                if (idTP != null) {
+                    event.reply("Vous êtes déjà inscrit au TP " + idTP + " pour cette partie !").setEphemeral(true).queue();
+                    return;
+                }
 
-        fw.write(reactionsMapS1.toString() + "\n" + reactionsMapS2.toString());
-        fw.close();
-    }
-
-    private static void sessionReacAdd (MessageReactionAddEvent e, HashMap < String, Integer > reactionMap, Long
-    chanId, Long messageId){
-        if (e.getChannel().getIdLong() == chanId && !e.getUser().isBot()) {
-            System.out.println(messageId + " " + e.getMember().getEffectiveName() + " " + e.getEmoji().getAsReactionCode());
-
-            String emoji = getEmojisRoot(e.getEmoji().toString());
-            if (reactionMap.containsKey(emoji)) {
-                if (reactionMap.get(emoji) > 17) {
-                    e.getReaction().removeReaction(e.getUser()).queue();
+                // si le créneau n'est pas plein
+                if (getListSizeFromMap(filePath, partie, nb) < 20) {
+                    addToMapListInFile(filePath, partie, nb, event.getUser().getIdLong());
+                    event.reply("Vous êtes inscrit au TP " + nb + " de la partie " + partie + " !").setEphemeral(true).queue();
                 } else {
-                    reactionMap.replace(emoji, reactionMap.get(emoji) + 1);
+                    event.reply("Le TP " + nb + " est plein !").setEphemeral(true).queue();
                 }
+
             } else {
-                reactionMap.put(emoji, 1);
+                String partie = Objects.requireNonNull(event.getOption("partie")).getAsString();
+
+                if (removeIdFromMapLists(filePath, partie, event.getUser().getIdLong()))
+                    event.reply("Vous êtes désinscrit de la partie " + partie + " !").setEphemeral(true).queue();
+                else
+                    event.reply("Vous n'êtes pas inscrit à la partie " + partie + " !").setEphemeral(true).queue();
+
             }
 
-            List<User> userList = new ArrayList<>();
+        } else if (event.getName().equals("inscrits")) {
+            String partie = Objects.requireNonNull(event.getOption("partie")).getAsString();
+            Integer nb = Objects.requireNonNull(event.getOption("tp")).getAsInt();
 
-            for (String val : reactionMap.keySet()) {
-                if (val.startsWith("U")) {
-                    userList.addAll(e.getJDA().getTextChannelById(chanId).retrieveReactionUsersById(messageId, Emoji.fromUnicode(val)).complete());
-                } else {
-                    userList.addAll(e.getJDA().getTextChannelById(chanId).retrieveReactionUsersById(messageId, e.getJDA().getEmojiById(val)).complete());
-                }
+            if (nb < 1 || nb > 17) {
+                event.reply("Le TP doit être compris entre 1 et 17 !").setEphemeral(true).queue();
+                return;
             }
 
-            List<String> usersIdList = userList.stream().map((user) -> {
-                return user.getId();
-            }).toList();
-
-            int count = 0;
-            for (String val : usersIdList) {
-                if (e.getUser().getId().equals(val)) {
-                    count++;
-                }
-                if (count == 2) {
-                    e.getReaction().removeReaction(e.getUser()).queue();
-                    break;
-                }
+            if (!partie.equals("ent") && !partie.equals("terminal") && !partie.equals("outilogique")) {
+                event.reply("La partie doit être \"ent\", \"terminal\" ou \"outilogique\" !").setEphemeral(true).queue();
+                return;
             }
 
-            try {
-                setReactionFile();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            List<Long> ids = getListFromMap(filePath, partie, nb);
+            if (ids != null) {
+                if (ids.isEmpty()) {
+                    event.reply("Personne n'est inscrit au **TP " + nb + "** de la partie **" + partie + "** !").setEphemeral(true).queue();
+                    return;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.append("Les inscrits au **TP ").append(nb).append("** de la partie **").append(partie).append("** sont :");
+                for (Long id : ids) {
+                    sb.append("\n- <@").append(id).append(">");
+                }
+                event.reply(sb.toString()).setEphemeral(true).queue();
+            } else {
+                event.reply("Le TP " + nb + " de la partie " + partie + " n'existe pas !").setEphemeral(true).queue();
             }
         }
     }
-
-    private static void sessionReacDel (MessageReactionRemoveEvent e, HashMap < String, Integer > reactionMap, Long
-        chanId){
-            if (e.getChannel().getIdLong() == chanId) {
-                String emoji = getEmojisRoot(e.getEmoji().toString());
-                reactionMap.replace(emoji, reactionMap.get(emoji) - 1);
-            }
-        }
-
-    private static String getEmojisRoot (String emoji){
-            String res = "";
-            if (emoji.contains("UnicodeEmoji")) {
-                res = emoji.replace("UnicodeEmoji(", "").replace(")", "");
-            } else {
-                res = emoji.replace("CustomEmoji:", "").replace(")", "");
-                res = res.substring(2).replace("(", "");
-            }
-            return res;
-        }
-
 }

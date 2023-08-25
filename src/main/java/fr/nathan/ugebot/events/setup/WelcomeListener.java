@@ -1,44 +1,41 @@
-package fr.nathan.ugebot.events;
+package fr.nathan.ugebot.events.setup;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
+import java.util.Objects;
 
 public class WelcomeListener extends ListenerAdapter {
 
     @Override
+    public void onGuildReady(GuildReadyEvent event) {
+        // Initialise le message de bienvenue (mauvaise réaction teacher)
+        event.getJDA().upsertCommand("welcome", "Créer le message du salon arrivé")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
+    }
+
+    @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent e) {
-        if (e.getChannel().getName().equalsIgnoreCase("arrivée")){
-            if (e.getReaction().getEmoji().equals(Emoji.fromFormatted("\uD83D\uDC68\u200D\uD83C\uDFEB"))){
-                e.getGuild().getTextChannelsByName("comprendre-discord", true).get(0).getPermissionContainer().getManager()
-                        .putMemberPermissionOverride(e.getUserIdLong(),
-                                Collections.singleton(Permission.VIEW_CHANNEL), null).queue();
-                e.getGuild().getTextChannelsByName("comprendre-discord²", true).get(0).getPermissionContainer().getManager()
-                        .putMemberPermissionOverride(e.getUserIdLong(),
-                                Collections.singleton(Permission.VIEW_CHANNEL), null).queue();
-            } else if (e.getReaction().getEmoji().equals(Emoji.fromUnicode("✅"))){
-                e.getGuild().getTextChannelsByName("verifyme", true).get(0).getPermissionContainer().getManager()
-                        .putMemberPermissionOverride(e.getUserIdLong(),
-                                Collections.singleton(Permission.VIEW_CHANNEL), null).queue();
-                /*e.getGuild().getTextChannelById(1021498368666636528L).getPermissionContainer().getManager()
-                        .putMemberPermissionOverride(e.getUserIdLong(),
-                                Collections.singleton(Permission.VIEW_CHANNEL), null).queue();*/
+        if (e.getChannel().getName().equalsIgnoreCase("arrivée")) {
+            if (e.getReaction().getEmoji().equals(Emoji.fromFormatted("\uD83E\uDDD1\u200D\uD83C\uDFEB"))) {
+                e.getGuild().addRoleToMember(Objects.requireNonNull(e.getMember()), e.getGuild().getRolesByName("tuto", true).get(0)).queue();
+            } else if (e.getReaction().getEmoji().equals(Emoji.fromUnicode("✅"))) {
+                e.getGuild().addRoleToMember(Objects.requireNonNull(e.getMember()), e.getGuild().getRolesByName("Non vérifié", true).get(0)).queue();
             }
         }
     }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if(event.getName().equals("welcome")) {
+        if (event.getName().equals("setup") && Objects.equals(event.getSubcommandName(), "welcome")) {
             event.reply("Le message d'arrivé est mis en place.").setEphemeral(true).queue();
             EmbedBuilder embed = new EmbedBuilder();
             EmbedBuilder embed2 = new EmbedBuilder();
@@ -47,7 +44,7 @@ public class WelcomeListener extends ListenerAdapter {
             embed.addField("Merci d'éviter tout propos injurieux ou déplacés",
                     "Les documents à caractère NSFW sont également interdits \uD83D\uDE09", false);
             embed.addField("Merci de vous renommer : \"Prenom Nom\" sur le discord",
-                    "__Pour se renommer :__ cliquez sur **L1 MI 2022/23 S1** en haut a gauche, puis " +
+                    "__Pour se renommer :__ cliquez sur **L1 MI 2023/24 S1** en haut a gauche, puis " +
                             "**modifier le profil du serveur**, et enfin entrer votre **Prénom Nom** " +
                             "dans la section **Pseudo**.", false);
             embed.setFooter("Un non respect des règles entrainera des sanctions");
@@ -63,25 +60,21 @@ public class WelcomeListener extends ListenerAdapter {
             embed2.setThumbnail("https://media.discordapp.net/attachments/644935102094376980" +
                     "/884218889125371915/logo-universite-gustave-eiffel-1579874878.png");
             embed2.setColor(0xf4c40c);
-            event.getChannel().sendMessage("**Bienvenue sur le serveur discord de la L1 Maths-Info !**\n" +
-                            "- L'objectif principal de ce Discord est de permettre la bonne circulation des informations" +
-                            " en ligne, en période présentielle et distancielle. Sur Discord, tous les messages sont archivés," +
-                            " et tout est fait pour que votre expérience soit la plus agréable possible. Enfin, ce Discord est un " +
-                            "espace d'échange intra-promotion permettant l'obtention d'informations entre enseignant(e)s et étudiant(e)s. \n" +
-                            "- Cela veut aussi dire que toute personne étrangère à la faculté n'a pas sa place ici et se verra banni si découvert.")
-                    .setEmbeds(embed.build(), embed2.build()).queue((msg) -> {
-                        msg.addReaction(Emoji.fromUnicode("\uD83E\uDDD1\u200D\uD83C\uDFEB")).queue();
-                    });
+            event.getChannel().sendMessage("""
+                            **Bienvenue sur le serveur discord de la L1 Maths-Info !**
+                            - L'objectif principal de ce Discord est de permettre la bonne circulation des informations en ligne, en période présentielle et distancielle. Sur Discord, tous les messages sont archivés, et tout est fait pour que votre expérience soit la plus agréable possible. Enfin, ce Discord est un espace d'échange intra-promotion permettant l'obtention d'informations entre enseignant(e)s et étudiant(e)s.\s
+                            - Cela veut aussi dire que toute personne étrangère à la faculté n'a pas sa place ici et se verra banni si découvert.""")
+                    .setEmbeds(embed.build(), embed2.build()).queue((msg) -> msg.addReaction(Emoji.fromUnicode("\uD83E\uDDD1\u200D\uD83C\uDFEB")).queue());
 
             EmbedBuilder embed3 = new EmbedBuilder();
             embed3.setTitle(":eyes: Comment avoir accès à tous les salons du Discord L1 MI ?");
             embed3.setDescription("Pour cela, vous allez devoir être vérifié par un administrateur.\n" +
                     "\"Etre vérifier\", signifie que vous serez valider comme étudiant inscrit en L1.\n" +
                     "Pour savoir si vous l'êtes déjà, il vous suffit de regarder si vous avez accès au salon " +
-                    event.getGuild().getTextChannelsByName("choisir-ses-groupes", true).get(0).getAsMention() +
+                    Objects.requireNonNull(event.getGuild()).getTextChannelsByName("choisir-ses-groupes", true).get(0).getAsMention() +
                     ".");
             embed3.addField("Sinon, pour se faire vérifier :",
-                    "Pour avoir accès au salon de vérification, cliquez sur la réaction  :white_check_mark:",false);
+                    "Pour avoir accès au salon de vérification, cliquez sur la réaction  :white_check_mark:", false);
             embed3.setColor(0x2ccb73);
             event.getChannel().sendMessageEmbeds(embed3.build()).queue((msg) -> msg.addReaction(Emoji.fromUnicode("✅")).queue());
 
@@ -91,15 +84,6 @@ public class WelcomeListener extends ListenerAdapter {
             embed4.setColor(0xc93030);
 
             event.getChannel().sendMessageEmbeds(embed4.build()).setActionRow(Button.danger("help", "Help")).queue();
-        }
-    }
-
-    @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent e) {
-        if (e.getChannel().getName().equals("verifyme")) {
-            if (!e.getMessage().getType().equals(MessageType.SLASH_COMMAND) && !e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                e.getMessage().delete().queue();
-            }
         }
     }
 }
