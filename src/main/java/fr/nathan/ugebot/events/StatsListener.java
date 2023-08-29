@@ -1,6 +1,6 @@
 package fr.nathan.ugebot.events;
 
-import fr.nathan.ugebot.functions.DateFunction;
+import fr.nathan.ugebot.managers.DateFormatter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
@@ -108,7 +108,7 @@ public class StatsListener extends ListenerAdapter {
                 Objects.requireNonNull(event.getGuild().getTextChannelById(1003689158201577496L)).sendMessage(
                                 "Voici quelques statistiques concernant le **cours du " + dateFormat.format(date)
                                         + "**.\n\n> Le cours a commencé à **" + timeFormat.format(startClasse)
-                                        + "** et fini à **" + DateFunction.getDate() + "**. Soit un total de **"
+                                        + "** et fini à **" + DateFormatter.getDate() + "**. Soit un total de **"
                                         + formatTimeMs(date.getTime() - startClasse) + "**.\n"
                                         + "> **" + finalTimeInChan.size() + "** étudiants ont assisté au cours.\n"
                                         + "> En moyenne, les étudiants sont restés **" + formatTimeMs(timeAverage)

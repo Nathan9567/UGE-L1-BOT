@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static fr.nathan.ugebot.functions.JsonManager.*;
+import static fr.nathan.ugebot.managers.JsonManager.*;
 
 public class PreRentree extends ListenerAdapter {
 

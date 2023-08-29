@@ -1,4 +1,4 @@
-package fr.nathan.ugebot.functions;
+package fr.nathan.ugebot.managers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,8 @@ public class JsonManager {
                 System.out.println("La map spécifiée n'existe pas dans les données chargées.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Une erreur est survenue lors de la lecture " +
+                    "du fichier JSON " + filePath + ".\n" + e.getMessage());
         }
     }
 
@@ -61,7 +62,8 @@ public class JsonManager {
             }
             return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Une erreur est survenue lors de la lecture " +
+                    "du fichier JSON " + filePath + ".\n" + e.getMessage());
         }
         return false;
     }
@@ -81,7 +83,8 @@ public class JsonManager {
                 return targetList != null ? targetList : List.of(); // Retourne une liste vide si null
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Une erreur est survenue lors de la lecture " +
+                    "du fichier JSON " + filePath + ".\n" + e.getMessage());
         }
 
         return null; // Retourne null en cas d'erreur ou si la clé n'est pas présente dans la map
@@ -106,7 +109,8 @@ public class JsonManager {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Une erreur est survenue lors de la lecture " +
+                    "du fichier JSON " + filePath + ".\n" + e.getMessage());
         }
 
         return -1; // Valeur de retour indiquant une erreur
@@ -133,7 +137,8 @@ public class JsonManager {
             }
             return null; // L'ID n'a pas été trouvé dans les listes de la map
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Une erreur est survenue lors de la lecture " +
+                    "du fichier JSON " + filePath + ".\n" + e.getMessage());
             return null;
         }
     }
