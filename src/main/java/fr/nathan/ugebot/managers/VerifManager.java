@@ -11,15 +11,17 @@ public class VerifManager {
 
     public static void safeAddRole(@NotNull Member mbr, String roleName) {
         if (mbr.getRoles().stream().noneMatch(role -> role.getName().equals(roleName))) {
-            Role role = mbr.getGuild().getRolesByName(roleName, true).get(0);
-            mbr.getGuild().addRoleToMember(mbr, role).queue();
+            List<Role> roles = mbr.getGuild().getRolesByName(roleName, true);
+            if (!roles.isEmpty())
+                mbr.getGuild().addRoleToMember(mbr, roles.get(0)).queue();
         }
     }
 
     public static void safeRemoveRole(@NotNull Member mbr, String roleName) {
         if (mbr.getRoles().stream().anyMatch(role -> role.getName().equals(roleName))) {
-            Role role = mbr.getGuild().getRolesByName(roleName, true).get(0);
-            mbr.getGuild().removeRoleFromMember(mbr, role).complete();
+            List<Role> roles = mbr.getGuild().getRolesByName(roleName, true);
+            if (!roles.isEmpty())
+                mbr.getGuild().removeRoleFromMember(mbr, roles.get(0)).complete();
         }
     }
 

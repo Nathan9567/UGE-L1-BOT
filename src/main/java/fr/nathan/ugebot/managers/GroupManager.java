@@ -29,20 +29,20 @@ public class GroupManager {
             safeAddRole(member, formation);
         }
 
-        safeAddRole(member, "TD-" + groupes.get("td"));
-        safeAddRole(member, "TP-" + groupes.get("tp"));
-        safeAddRole(member, "Amphi " + groupes.get("amphi"));
-        if (groupes.get("anglais renforce").equalsIgnoreCase("X"))
+        safeAddRole(member, "TD-" + groupes.getOrDefault("td", "azertyuiop"));
+        safeAddRole(member, "TP-" + groupes.getOrDefault("tp", "azertyuiop"));
+        safeAddRole(member, "Amphi " + groupes.getOrDefault("amphi", "azertyuiop"));
+        if (groupes.getOrDefault("anglais renforce", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Anglais renforcé");
-        if (groupes.get("italien").equalsIgnoreCase("X"))
+        if (groupes.getOrDefault("italien", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Italien");
-        if (groupes.get("electr").equalsIgnoreCase("X"))
+        if (groupes.getOrDefault("electr", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Electronique");
-        if (groupes.get("phys 1").equalsIgnoreCase("X"))
+        if (groupes.getOrDefault("phys 1", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Physique");
-        if (groupes.get("trans. energ.").equalsIgnoreCase("X"))
+        if (groupes.getOrDefault("trans. energ.", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Transition énergétique");
-        String japonais = groupes.get("gr jap");
+        String japonais = groupes.getOrDefault("gr jap", "azertyuiop");
         if (!Objects.equals(japonais, "") && !japonais.equalsIgnoreCase("VAL")) {
             safeAddRole(member, "Japonais Gr. " + japonais);
         }

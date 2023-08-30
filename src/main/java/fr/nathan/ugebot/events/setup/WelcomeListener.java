@@ -67,13 +67,13 @@ public class WelcomeListener extends ListenerAdapter {
             event.getChannel().sendMessage("""
                             **Bienvenue sur le serveur discord de la L1 Maths-Info !**
                             - L'objectif principal de ce Discord est de permettre la bonne circulation des informations en ligne, en période présentielle et distancielle. Sur Discord, tous les messages sont archivés, et tout est fait pour que votre expérience soit la plus agréable possible. Enfin, ce Discord est un espace d'échange intra-promotion permettant l'obtention d'informations entre enseignant(e)s et étudiant(e)s.\s
-                            - Cela veut aussi dire que toute personne étrangère à la faculté n'a pas sa place ici et se verra banni si découvert.""")
+                            - Cela veut aussi dire que toute personne étrangère à la faculté n'a pas sa place ici et se verra banni si découvert. (et il sera découvert :detective:)""")
                     .setEmbeds(embed.build(), embed2.build()).queue((msg) -> msg.addReaction(Emoji.fromUnicode("\uD83E\uDDD1\u200D\uD83C\uDFEB")).queue());
 
             EmbedBuilder embed3 = new EmbedBuilder();
             embed3.setTitle(":eyes: Comment avoir accès à tous les salons du Discord L1 MI ?");
             embed3.setDescription("Pour cela, vous allez devoir être vérifié par un administrateur.\n" +
-                    "\"Etre vérifier\", signifie que vous serez validés comme étudiant inscrit en L1.\n" +
+                    "\"Etre vérifié\", signifie que vous serez validé comme étudiant inscrit en L1.\n" +
                     "Pour savoir si vous l'êtes déjà, il vous suffit de regarder si vous avez toujours accès au salon " +
                     Objects.requireNonNull(event.getGuild()).getTextChannelsByName("verifyme", true).get(0).getAsMention() +
                     ".");
