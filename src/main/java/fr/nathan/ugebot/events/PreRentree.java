@@ -114,8 +114,15 @@ public class PreRentree extends ListenerAdapter {
 
                 // si le créneau n'est pas plein
                 if (getListSizeFromMap(filePath, partie, nb) < 20) {
+                    StringBuilder sb = new StringBuilder();
                     addToMapListInFile(filePath, partie, nb, event.getUser().getIdLong());
-                    event.reply("Vous êtes inscrit au TP " + nb + " de la partie " + partie + " !").setEphemeral(true).queue();
+                    sb.append("Vous êtes inscrit au TP ").append(nb).append(" de la partie ").append(partie).append(" !");
+                    if ((partie.equals("ent") && (nb == 1 || nb == 2 || nb == 3)) ||
+                            (partie.equals("terminal") && (nb == 8 || nb == 9 || nb == 10)) ||
+                            (partie.equals("outilogique") && (nb == 3 || nb == 4 || nb == 5))) {
+                            sb.append("\nAttention, ce TP est reservé aux MIASHS, merci de te désinscrire si tu n'es pas dans cette filière !");
+                    }
+                    event.reply(sb.toString()).setEphemeral(true).queue();
                 } else {
                     event.reply("Le TP " + nb + " est plein !").setEphemeral(true).queue();
                 }
