@@ -37,14 +37,25 @@ public class VerifListener extends ListenerAdapter {
     }
 
     static void verifymeMessage(@NotNull SlashCommandInteractionEvent event, int numEtudiant) {
+        List<Map<String, String>> listeEtu = CSVManager.chargerDonneesCSV("liste.csv");
+        StringBuilder sb = new StringBuilder();
+
         event.reply("Demande envoyé à l'équipe d'administration.\n" +
                         "Une réponse vous sera donné dans les plus brefs délais.")
                 .setEphemeral(true).queue();
         event.getUser().openPrivateChannel().queue((chan) -> chan.sendMessage("Demande envoyé à l'équipe d'administration.\n" +
                 "Une réponse vous sera donné dans les plus brefs délais.").queue());
+
+        List<Map<String, String>> etudiant = rechercherDonnees(listeEtu, "n°etudiant", String.valueOf(numEtudiant));
+        sb.append(":envelope: `[").append(getDate()).append("]` L'utilisateur ").append(event.getUser().getAsMention())
+                .append(" a demandé à être vérifié avec le numéro d'étudiant suivant : **").append(numEtudiant).append("**. ");
+        if (etudiant.isEmpty())
+            sb.append("(il ne figure pas dans la liste)");
+        else
+            sb.append("(il figure dans la liste sous le nom de **").append(etudiant.get(0).get("prenom")).append(" ").append(etudiant.get(0).get("nom")).append("**)");
+
         Objects.requireNonNull(event.getGuild()).getTextChannelsByName("verifications", true).get(0)
-                .sendMessage("✉ `[" + getDate() + "]` L'utilisateur " + event.getUser().getAsMention() +
-                        " a demandé à être vérifié avec le numéro d'étudiant suivant : **" + numEtudiant + "**.")
+                .sendMessage(sb.toString())
                 .setActionRow(Button.success("okStudent", "Accepter"), Button.danger("notOkStudent", "Refuser"),
                         Button.secondary("nameReq", "Prenom/Nom"))
                 .queue();

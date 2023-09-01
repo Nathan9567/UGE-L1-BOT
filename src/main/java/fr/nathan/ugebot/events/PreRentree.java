@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
@@ -52,16 +53,25 @@ public class PreRentree extends ListenerAdapter {
                         .map(word -> new Command.Choice(word, word)) // map the words to choices
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
-            }
-            if (event.getFocusedOption().getName().equals("tp")) {
+            } else if (event.getFocusedOption().getName().equals("tp")) {
                 Integer[] tps = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                         11, 12, 13, 14, 15, 16, 17};
-                String partie = Objects.requireNonNull(event.getOption("partie")).getAsString();
-                List<Command.Choice> options = Stream.of(tps)
-                        .filter(word -> word.toString().startsWith(event.getFocusedOption().getValue())) // only display words that start with the user's current input
-                        .filter(word -> getListSizeFromMap("sessions.json", partie, word) < 20)
-                        .map(word -> new Command.Choice(String.valueOf(word), word)) // map the words to choices
-                        .collect(Collectors.toList());
+                OptionMapping partieOpt = event.getOption("partie");
+                if (partieOpt == null) return;
+                String partie = partieOpt.getAsString();
+                List<Command.Choice> options;
+                if (event.getName().equals("inscrits")) {
+                    options = Stream.of(tps)
+                            .filter(word -> word.toString().startsWith(event.getFocusedOption().getValue())) // only display words that start with the user's current input
+                            .map(word -> new Command.Choice(String.valueOf(word), word)) // map the words to choices
+                            .collect(Collectors.toList());
+                } else {
+                    options = Stream.of(tps)
+                            .filter(word -> word.toString().startsWith(event.getFocusedOption().getValue())) // only display words that start with the user's current input
+                            .filter(word -> getListSizeFromMap("sessions.json", partie, word) < 20)
+                            .map(word -> new Command.Choice(String.valueOf(word), word)) // map the words to choices
+                            .collect(Collectors.toList());
+                }
                 event.replyChoices(options).queue();
             }
         }
@@ -163,6 +173,7 @@ public class PreRentree extends ListenerAdapter {
                 for (Long id : ids) {
                     sb.append("\n- <@").append(id).append(">");
                 }
+                sb.append("\n\nIl y a ").append(ids.size()).append(" inscrits !");
                 event.reply(sb.toString()).setEphemeral(true).queue();
             } else {
                 event.reply("Le TP " + nb + " de la partie " + partie + " n'existe pas !").setEphemeral(true).queue();
