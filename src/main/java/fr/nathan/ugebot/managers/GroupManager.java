@@ -32,20 +32,35 @@ public class GroupManager {
         safeAddRole(member, "TD-" + groupes.getOrDefault("td", "azertyuiop"));
         safeAddRole(member, "TP-" + groupes.getOrDefault("tp", "azertyuiop"));
         safeAddRole(member, "Amphi " + groupes.getOrDefault("amphi", "azertyuiop"));
-        if (groupes.getOrDefault("anglais renforce", "azertyuiop").equalsIgnoreCase("X"))
-            safeAddRole(member, "Anglais renforcé");
-        if (groupes.getOrDefault("italien", "azertyuiop").equalsIgnoreCase("X"))
-            safeAddRole(member, "Italien");
-        if (groupes.getOrDefault("electr", "azertyuiop").equalsIgnoreCase("X"))
-            safeAddRole(member, "Electronique");
-        if (groupes.getOrDefault("phys 1", "azertyuiop").equalsIgnoreCase("X"))
-            safeAddRole(member, "Physique");
+
         if (groupes.getOrDefault("trans. energ.", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Transition énergétique");
+
+        if (groupes.getOrDefault("phys 1", "azertyuiop").equalsIgnoreCase("X"))
+            safeAddRole(member, "Physique");
+
+        if (groupes.getOrDefault("electr", "azertyuiop").equalsIgnoreCase("X"))
+            safeAddRole(member, "Electronique");
+
+        if (groupes.getOrDefault("italien", "azertyuiop").equalsIgnoreCase("X"))
+            safeAddRole(member, "Italien");
+
         String japonais = groupes.getOrDefault("gr jap", "azertyuiop");
         if (!Objects.equals(japonais, "") && !japonais.equalsIgnoreCase("VAL")) {
             safeAddRole(member, "Japonais Gr. " + japonais);
         }
+
+        String anglaisRenf = groupes.getOrDefault("gr angl renf", "azertyuiop");
+        if (!Objects.equals(anglaisRenf, "") && !anglaisRenf.equalsIgnoreCase("VAL")) {
+            safeAddRole(member, "Anglais renforcé Gr. " + anglaisRenf);
+        }
+
+        if (groupes.getOrDefault("anglais debutant", "azertyuiop").equalsIgnoreCase("X"))
+            safeAddRole(member, "Anglais débutant");
+
+        if (groupes.getOrDefault("ecriture", "azertyuiop").equalsIgnoreCase("X"))
+            safeAddRole(member, "Atelier d'écriture");
+
         return true;
     }
 
