@@ -42,7 +42,7 @@ public class CSVManager {
 
     public static List<Map<String, String>> rechercherDonnees(List<Map<String, String>> donnees, String colonne, String valeur) {
         return donnees.stream()
-                .filter(ligne -> ligne.containsKey(colonne) && ligne.get(colonne).equals(valeur))
+                .filter(ligne -> ligne.containsKey(colonne) && ligne.get(colonne).equalsIgnoreCase(valeur))
                 .collect(Collectors.toList());
     }
 
