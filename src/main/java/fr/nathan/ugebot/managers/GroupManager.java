@@ -13,15 +13,17 @@ import static fr.nathan.ugebot.managers.VerifManager.safeAddRole;
 public class GroupManager {
 
     public static boolean updateUser(Member member) {
-        List<Map<String, String>> listeCSV = CSVManager.chargerDonneesCSV("liste.csv");
+        List<Map<String, String>> listeCSV = CSVManager.chargerDonneesCSV("liste2.csv");
         List<Map<String, String>> verif = CSVManager.chargerDonneesCSV("verif.csv");
 
         String numEtudiant = VerifManager.obtenirNumEtudiant(verif, member.getId());
         if (numEtudiant == null)
             return false;
         List<Map<String, String>> dataCSV = CSVManager.rechercherDonnees(listeCSV, "n°etudiant", numEtudiant);
-        if (dataCSV.isEmpty())
+        if (dataCSV.isEmpty()) {
+            System.out.println("dataCSV is empty for " + member.getEffectiveName());
             return false;
+        }
         Map<String, String> groupes = dataCSV.get(0);
 
         String formation = groupes.get("formation");
