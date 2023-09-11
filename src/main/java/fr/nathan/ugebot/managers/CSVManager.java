@@ -19,6 +19,7 @@ public class CSVManager {
             String headerLine = reader.readLine(); // Première ligne pour obtenir les noms de colonnes
 
             if (headerLine != null) {
+                headerLine = headerLine.replaceAll("\uFEFF", ""); // Suppression du caractère BOM
                 String[] colonnes = headerLine.split(";");
                 String ligne;
                 while ((ligne = reader.readLine()) != null) {
@@ -41,9 +42,12 @@ public class CSVManager {
     }
 
     public static List<Map<String, String>> rechercherDonnees(List<Map<String, String>> donnees, String colonne, String valeur) {
-        return donnees.stream()
-                .filter(ligne -> ligne.containsKey(colonne) && ligne.get(colonne).equalsIgnoreCase(valeur))
-                .collect(Collectors.toList());
+        for (Map<String, String> ligne : donnees) {
+            if (ligne.get(colonne).equals(valeur)) {
+                return List.of(ligne);
+            }
+        }
+        return List.of();
     }
 
     public static void ajouterLigneCSV(String nomFichier, String ligne) {

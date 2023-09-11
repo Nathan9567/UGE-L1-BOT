@@ -13,7 +13,7 @@ import static fr.nathan.ugebot.managers.VerifManager.safeAddRole;
 public class GroupManager {
 
     public static boolean updateUser(Member member) {
-        List<Map<String, String>> listeCSV = CSVManager.chargerDonneesCSV("liste2.csv");
+        List<Map<String, String>> listeCSV = CSVManager.chargerDonneesCSV("liste.csv");
         List<Map<String, String>> verif = CSVManager.chargerDonneesCSV("verif.csv");
 
         String numEtudiant = VerifManager.obtenirNumEtudiant(verif, member.getId());
@@ -41,7 +41,7 @@ public class GroupManager {
         if (groupes.getOrDefault("phys 1", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Physique");
 
-        if (groupes.getOrDefault("electr", "azertyuiop").equalsIgnoreCase("X"))
+        if (groupes.getOrDefault("electro", "azertyuiop").equalsIgnoreCase("X"))
             safeAddRole(member, "Electronique");
 
         if (groupes.getOrDefault("italien", "azertyuiop").equalsIgnoreCase("X"))
@@ -52,7 +52,7 @@ public class GroupManager {
             safeAddRole(member, "Japonais Gr. " + japonais);
         }
 
-        String anglaisRenf = groupes.getOrDefault("gr angl renf", "azertyuiop");
+        String anglaisRenf = groupes.getOrDefault("gr ang renf", "azertyuiop");
         if (!Objects.equals(anglaisRenf, "") && !anglaisRenf.equalsIgnoreCase("VAL")) {
             safeAddRole(member, "Anglais renforcé Gr. " + anglaisRenf);
         }
